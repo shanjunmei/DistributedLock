@@ -4,7 +4,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 public class DistributeLockMethodExcute {
-	
+
 	/**
 	 * 
 	 * @param target
@@ -18,12 +18,16 @@ public class DistributeLockMethodExcute {
 	 */
 	public static Object lockMethodExcute(Object target, Method method, Object[] args, Lock lock)
 			throws Exception, IllegalAccessException, InvocationTargetException {
-		UniqMethod uniqMethod = method.getAnnotation(UniqMethod.class);
+		LockMethod uniqMethod = method.getAnnotation(LockMethod.class);
 		String type = null;
 		if (uniqMethod != null) {
 			type = uniqMethod.value();
+			int lockIndex=uniqMethod.lockIndex();
 			if ("".equals(type)) {
 				type = method.getReturnType().getName() + "." + method.getName();
+			}
+			if(lockIndex>-1){
+				type=type+":"+args[lockIndex];
 			}
 			boolean hasLock = lock.lock(type);
 			if (hasLock) {
