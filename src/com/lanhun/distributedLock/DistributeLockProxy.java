@@ -21,7 +21,7 @@ public class DistributeLockProxy implements InvocationHandler {
 
 	@Override
 	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-		return DistributeLockMethodExcutor.lockMethodExcute(target, method, args, lock);
+		return DistributeLockMethodExecutor.lockMethodExecute(target, method, args, lock);
 
 	}
 

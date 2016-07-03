@@ -20,7 +20,7 @@ public class DistributeLockInterceptor implements MethodInterceptor {
 	@Override
 	public Object intercept(Object target, Method method, Object[] args, MethodProxy proxy) throws Throwable {
 
-		return DistributeLockMethodExcutor.lockMethodExcute(target, method, args, lock);
+		return DistributeLockMethodExecutor.lockMethodExecute(target, method, args, lock);
 	}
 
 }

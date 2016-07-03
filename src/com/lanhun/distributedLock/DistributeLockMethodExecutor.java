@@ -3,7 +3,7 @@ package com.lanhun.distributedLock;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-public class DistributeLockMethodExcutor {
+public class DistributeLockMethodExecutor {
 
 	/**
 	 * 
@@ -16,7 +16,7 @@ public class DistributeLockMethodExcutor {
 	 * @throws IllegalAccessException
 	 * @throws InvocationTargetException
 	 */
-	public static Object lockMethodExcute(Object target, Method method, Object[] args, Lock lock)
+	public static Object lockMethodExecute(Object target, Method method, Object[] args, Lock lock)
 			throws Exception, IllegalAccessException, InvocationTargetException {
 		LockMethod uniqMethod = method.getAnnotation(LockMethod.class);
 		String type = null;
