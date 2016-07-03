@@ -9,7 +9,7 @@ import org.apache.logging.log4j.Logger;
 
 import redis.clients.jedis.Jedis;
 
-public class DistrbuteLock implements Lock {
+public class DistributeLock implements Lock {
 
 	private Logger logger = LogManager.getFormatterLogger(getClass());
 
