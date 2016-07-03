@@ -1,6 +1,7 @@
 package com.lanhun.distributedLock;
 
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
@@ -12,6 +13,8 @@ public class DistrbuteLock implements Lock {
 
 	private Logger logger = LogManager.getFormatterLogger(getClass());
 
+	private ConcurrentHashMap<String, String> lockCache = new ConcurrentHashMap<String, String>();
+
 	private ThreadLocal<String> keyCache = new ThreadLocal<String>();
 
 	private Jedis jedis;
@@ -20,11 +23,11 @@ public class DistrbuteLock implements Lock {
 		this.jedis = jedis;
 	}
 
-	//@Override
+	// @Override
 	public String prefix() {
 		return "_lock";
 	}
-	
+
 	// @Override
 	protected String generateKey() {
 		return UUID.randomUUID().toString().replace("-", "");
@@ -37,8 +40,16 @@ public class DistrbuteLock implements Lock {
 
 	@Override
 	public boolean lock(String type, int timeout) {
+		if (timeout == 0) {// 没有设置超时时间的锁，先校验本地缓存
+			if (lockCache.containsKey(type)) {
+				if (lockCache.get(type).equals(keyCache.get())) {
+					return true;
+				}
+			}
+		}
+
 		String key = generateKey();
-		type=prefix()+":"+type;
+		type = prefix() + ":" + type;
 		long r = jedis.setnx(type, key);
 		if (timeout != 0) {
 			jedis.expire(type, timeout);
@@ -47,6 +58,7 @@ public class DistrbuteLock implements Lock {
 		if (r > 0) {
 			if (timeout > 0) {
 				keyCache.set(key);
+				lockCache.put(type, key);
 			}
 			return true;
 		}
@@ -80,8 +92,10 @@ public class DistrbuteLock implements Lock {
 
 	@Override
 	public void unLock(String type) {
-		type=prefix()+":"+type;
-		jedis.del(type + "_" + keyCache.get());
+		type = prefix() + ":" + type;
+		lockCache.remove(type, lockCache.get(type));
 		keyCache.remove();
+		jedis.del(type + "_" + keyCache.get());
+
 	}
 }
