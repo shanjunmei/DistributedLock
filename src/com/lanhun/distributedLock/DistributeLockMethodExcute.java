@@ -31,7 +31,6 @@ public class DistributeLockMethodExcute {
 					Object ret = method.invoke(target, args);
 					return ret;
 				} catch (Exception e) {
-					// unLock
 					throw e;
 				} finally {
 					lock.unLock(type);
