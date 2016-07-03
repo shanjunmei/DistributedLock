@@ -10,8 +10,8 @@ import java.lang.reflect.Proxy;
 public class LockProxyFactory {
 
 	@SuppressWarnings("unchecked")
-	public static <T> T createProxy(Class<?> interfaces[], Lock lock, T target) {
-		return (T) Proxy.newProxyInstance(target.getClass().getClassLoader(), interfaces,
+	public static <T> T createProxy(Lock lock, T target) {
+		return (T) Proxy.newProxyInstance(target.getClass().getClassLoader(), target.getClass().getInterfaces(),
 				new DistributeLockProxy(target, lock));
 	}
 
