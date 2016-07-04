@@ -1,5 +1,7 @@
 package com.lanhun.distributedLock;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
@@ -15,7 +17,7 @@ public class DistributeLock implements Lock {
 
 	private ConcurrentHashMap<String, String> lockCache = new ConcurrentHashMap<String, String>();
 
-	private ThreadLocal<String> keyCache = new ThreadLocal<String>();
+	private ThreadLocal<Map<String, String>> keyCache = new ThreadLocal<Map<String, String>>();
 
 	private Jedis jedis;
 
@@ -58,8 +60,13 @@ public class DistributeLock implements Lock {
 		}
 
 		if (r > 0) {
+			Map<String, String> cache = keyCache.get();
+			if (cache == null) {
+				cache = new HashMap<>();
+				keyCache.set(cache);
+			}
+			cache.put(type, key);
 			if (timeout == 0) {
-				keyCache.set(key);
 				lockCache.put(type, key);
 			}
 			return true;
@@ -95,16 +102,19 @@ public class DistributeLock implements Lock {
 	@Override
 	public void unLock(String type) {
 		type = prefix() + ":" + type;
-		String lockCacheKey=keyCache.get();
-		keyCache.remove();
-		lockCache.remove(type, lockCacheKey);
-		String key = jedis.get(type);
-		if (key != null && !"".equals(key)) {
-			if (key.equals(lockCacheKey)) {
-				jedis.del(type);
+		Map<String, String> cache = keyCache.get();
+		if (cache != null) {
+			String lockCacheKey = cache.get(type);
+			lockCache.remove(type, lockCacheKey);
+			String key = jedis.get(type);
+			if (key != null && !"".equals(key)) {
+				if (key.equals(lockCacheKey)) {
+					jedis.del(type);
+				}
 			}
+		}else{
+			//忽略未加锁 进行解锁
 		}
-		
-		
+
 	}
 }
