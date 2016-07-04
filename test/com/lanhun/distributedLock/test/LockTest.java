@@ -15,7 +15,7 @@ public class LockTest {
 		((DistributeLock) lock).setJedis(jedis);
 		lock.lock(type);
 		lock.unLock(type);
-		for(int i=0;i<10;i++){
+		for(int i=0;i<100;i++){
 			t(type, lock);
 		}
 	}
