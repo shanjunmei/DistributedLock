@@ -40,6 +40,8 @@ public class DistributeLock implements Lock {
 
 	@Override
 	public boolean lock(String type, int timeout) {
+		type = prefix() + ":" + type;
+
 		if (timeout == 0) {// 没有设置超时时间的锁，先校验本地缓存
 			if (lockCache.containsKey(type)) {
 				if (lockCache.get(type).equals(keyCache.get())) {
@@ -49,14 +51,14 @@ public class DistributeLock implements Lock {
 		}
 
 		String key = generateKey();
-		type = prefix() + ":" + type;
+
 		long r = jedis.setnx(type, key);
 		if (timeout != 0) {
 			jedis.expire(type, timeout);
 		}
 
 		if (r > 0) {
-			if (timeout > 0) {
+			if (timeout == 0) {
 				keyCache.set(key);
 				lockCache.put(type, key);
 			}
@@ -93,9 +95,16 @@ public class DistributeLock implements Lock {
 	@Override
 	public void unLock(String type) {
 		type = prefix() + ":" + type;
-		lockCache.remove(type, lockCache.get(type));
+		String lockCacheKey=keyCache.get();
 		keyCache.remove();
-		jedis.del(type + "_" + keyCache.get());
-
+		lockCache.remove(type, lockCacheKey);
+		String key = jedis.get(type);
+		if (key != null && !"".equals(key)) {
+			if (key.equals(lockCacheKey)) {
+				jedis.del(type);
+			}
+		}
+		
+		
 	}
 }
