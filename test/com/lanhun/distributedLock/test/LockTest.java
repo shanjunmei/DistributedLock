@@ -14,10 +14,15 @@ public class LockTest {
 		Lock lock = new DistributeLock();
 		((DistributeLock) lock).setJedis(jedis);
 		lock.lock(type);
+		
+		
+		lock.lock(type+"12");
+		
+		lock.unLock(type+"12");
 		lock.unLock(type);
-		for(int i=0;i<100;i++){
+		/*for(int i=0;i<100;i++){
 			t(type, lock);
-		}
+		}*/
 	}
 
 	private static void t(String type, Lock lock) {
