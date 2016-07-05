@@ -14,7 +14,7 @@ import redis.clients.jedis.JedisPool;
 
 public class DistributeLock implements Lock {
 
-	private Logger logger = LogManager.getFormatterLogger(getClass());
+	private Logger logger = LogManager.getLogger(getClass());
 
 	private ConcurrentHashMap<String, String> lockCache = new ConcurrentHashMap<String, String>();
 
