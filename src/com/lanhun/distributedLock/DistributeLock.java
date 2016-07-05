@@ -10,6 +10,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
 
 public class DistributeLock implements Lock {
 
@@ -19,10 +20,10 @@ public class DistributeLock implements Lock {
 
 	private ThreadLocal<Map<String, String>> keyCache = new ThreadLocal<Map<String, String>>();
 
-	private Jedis jedis;
+	private JedisPool jedisPool;
 
-	public void setJedis(Jedis jedis) {
-		this.jedis = jedis;
+	public void setJedisPool(JedisPool jedisPool) {
+		this.jedisPool = jedisPool;
 	}
 
 	// @Override
@@ -54,11 +55,15 @@ public class DistributeLock implements Lock {
 
 		String key = generateKey();
 
+		Jedis jedis=jedisPool.getResource();
+		
 		long r = jedis.setnx(type, key);
 		if (timeout != 0) {
 			jedis.expire(type, timeout);
 		}
 
+		jedis.close();
+		
 		if (r > 0) {
 			Map<String, String> cache = keyCache.get();
 			if (cache == null) {
@@ -106,12 +111,14 @@ public class DistributeLock implements Lock {
 		if (cache != null) {
 			String lockCacheKey = cache.get(type);
 			lockCache.remove(type, lockCacheKey);
+			Jedis jedis=jedisPool.getResource();
 			String key = jedis.get(type);
 			if (key != null && !"".equals(key)) {
 				if (key.equals(lockCacheKey)) {
 					jedis.del(type);
 				}
 			}
+			jedis.close();
 		}else{
 			//忽略未加锁 进行解锁
 		}

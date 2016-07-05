@@ -4,22 +4,25 @@ import com.lanhun.distributedLock.DistributeLock;
 import com.lanhun.distributedLock.Lock;
 
 import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
 
 public class LockTest {
 
 	public static void main(String[] args) {
 		String type = "test";
-
-		Jedis jedis = new Jedis("127.0.0.1", 6379);
+		String host="127.0.0.1";
+		int port=6379;
+		
+		JedisPool jedisPool=new JedisPool(host,port);
 		Lock lock = new DistributeLock();
-		((DistributeLock) lock).setJedis(jedis);
+		((DistributeLock) lock).setJedisPool(jedisPool);
 		lock.lock(type);
 		
 		
 		lock.lock(type+"12");
 		
-		lock.unLock(type+"12");
-		lock.unLock(type);
+		//lock.unLock(type+"12");
+		//lock.unLock(type);
 		/*for(int i=0;i<100;i++){
 			t(type, lock);
 		}*/
