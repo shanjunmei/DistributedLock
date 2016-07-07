@@ -46,24 +46,27 @@ public class DistributeLock implements Lock {
 		type = prefix() + ":" + type;
 
 		if (timeout == 0) {// 没有设置超时时间的锁，先校验本地缓存
-			if (lockCache.containsKey(type)) {
-				if (lockCache.get(type).equals(keyCache.get())) {
-					return true;
+			synchronized (lockCache) {
+				if (lockCache.containsKey(type)) {
+					if (lockCache.get(type).equals(keyCache.get())) {
+						return true;
+					}
 				}
 			}
+
 		}
 
 		String key = generateKey();
 
-		Jedis jedis=jedisPool.getResource();
-		
+		Jedis jedis = jedisPool.getResource();
+
 		long r = jedis.setnx(type, key);
 		if (timeout != 0) {
 			jedis.expire(type, timeout);
 		}
 
 		jedis.close();
-		
+
 		if (r > 0) {
 			Map<String, String> cache = keyCache.get();
 			if (cache == null) {
@@ -72,7 +75,10 @@ public class DistributeLock implements Lock {
 			}
 			cache.put(type, key);
 			if (timeout == 0) {
-				lockCache.put(type, key);
+				synchronized (lockCache) {
+					lockCache.put(type, key);
+				}
+				
 			}
 			return true;
 		}
@@ -110,8 +116,11 @@ public class DistributeLock implements Lock {
 		Map<String, String> cache = keyCache.get();
 		if (cache != null) {
 			String lockCacheKey = cache.get(type);
-			lockCache.remove(type, lockCacheKey);
-			Jedis jedis=jedisPool.getResource();
+			synchronized (lockCache) {
+				lockCache.remove(type, lockCacheKey);
+			}
+			
+			Jedis jedis = jedisPool.getResource();
 			String key = jedis.get(type);
 			if (key != null && !"".equals(key)) {
 				if (key.equals(lockCacheKey)) {
@@ -119,8 +128,8 @@ public class DistributeLock implements Lock {
 				}
 			}
 			jedis.close();
-		}else{
-			//忽略未加锁 进行解锁
+		} else {
+			// 忽略未加锁 进行解锁
 		}
 
 	}
