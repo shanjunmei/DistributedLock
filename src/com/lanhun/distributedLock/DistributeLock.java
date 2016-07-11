@@ -10,7 +10,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPool;
+import redis.clients.util.Pool;
 
 public class DistributeLock implements Lock {
 
@@ -20,9 +20,9 @@ public class DistributeLock implements Lock {
 
 	private ThreadLocal<Map<String, String>> keyCache = new ThreadLocal<Map<String, String>>();
 
-	private JedisPool jedisPool;
+	private Pool<Jedis> jedisPool;
 
-	public void setJedisPool(JedisPool jedisPool) {
+	public void setJedisPool(Pool<Jedis> jedisPool) {
 		this.jedisPool = jedisPool;
 	}
 
