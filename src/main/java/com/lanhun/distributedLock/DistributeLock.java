@@ -93,7 +93,14 @@ public class DistributeLock implements Lock {
 	@Override
 	public boolean tryLock(String type, long timeout) {
 		if (timeout == 0) {
-			return lock(type);
+			while (!lock(type)) {
+				try {
+					TimeUnit.MILLISECONDS.sleep(timeout - 10);
+				} catch (InterruptedException e) {
+					logger.info(e);
+				}
+			}
+			return true;
 		}
 		long t = System.currentTimeMillis();
 		while ((System.currentTimeMillis() - t) < timeout) {
