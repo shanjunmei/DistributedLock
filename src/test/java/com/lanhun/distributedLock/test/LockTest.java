@@ -3,7 +3,6 @@ package com.lanhun.distributedLock.test;
 import com.lanhun.distributedLock.DistributeLock;
 import com.lanhun.distributedLock.Lock;
 
-import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 
 public class LockTest {
