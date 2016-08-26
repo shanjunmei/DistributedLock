@@ -29,7 +29,7 @@ public class DistributeLockMethodExecutor {
 			if(lockIndex>-1){
 				type=type+":"+args[lockIndex];
 			}
-			boolean hasLock = lock.lock(type);
+			boolean hasLock = lock.lock(type,"");
 			if (hasLock) {
 				try {
 					Object ret = method.invoke(target, args);
@@ -37,7 +37,7 @@ public class DistributeLockMethodExecutor {
 				} catch (Exception e) {
 					throw e;
 				} finally {
-					lock.unLock(type);
+					lock.unLock(type,"");
 				}
 			} else {
 				throw new RuntimeException("can't get the lock:" + type);
