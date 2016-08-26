@@ -11,14 +11,14 @@ public interface Lock {
 
 	//String prefix();
 	
-	boolean lock(String type);
+	boolean lock(String type,String key);
 
-	boolean lock(String type, int timeout);
+	boolean lock(String type,String key, int timeout);
 
-	boolean tryLock(String type);
+	boolean tryLock(String type,String key);
 
-	boolean tryLock(String type, long timeout);
+	boolean tryLock(String type,String key, long timeout);
 
-	void unLock(String key);
+	void unLock(String type,String key);
 
 }

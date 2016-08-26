@@ -37,13 +37,13 @@ public class DistributeLock implements Lock {
 	}
 
 	@Override
-	public boolean lock(String type) {
-		return lock(type, 0);
+	public boolean lock(String type,String key) {
+		return lock(type,key, 0);
 	}
 
 	@Override
-	public boolean lock(String type, int timeout) {
-		type = prefix() + ":" + type;
+	public boolean lock(String type,String typeKey, int timeout) {
+		type = prefix() + ":" + type+":"+typeKey;
 
 		if (timeout == 0) {// 没有设置超时时间的锁，先校验本地缓存
 			synchronized (lockCache) {
@@ -86,14 +86,14 @@ public class DistributeLock implements Lock {
 	}
 
 	@Override
-	public boolean tryLock(String type) {
-		return tryLock(type, 0L);
+	public boolean tryLock(String type,String key) {
+		return tryLock(type,key, 0L);
 	}
 
 	@Override
-	public boolean tryLock(String type, long timeout) {
+	public boolean tryLock(String type,String key, long timeout) {
 		if (timeout == 0) {
-			while (!lock(type)) {
+			while (!lock(type,key)) {
 				try {
 					TimeUnit.MILLISECONDS.sleep(timeout - 10);
 				} catch (InterruptedException e) {
@@ -105,7 +105,7 @@ public class DistributeLock implements Lock {
 		long t = System.currentTimeMillis();
 		while ((System.currentTimeMillis() - t) < timeout) {
 			try {
-				if (!lock(type)) {
+				if (!lock(type,key)) {
 					TimeUnit.MILLISECONDS.sleep(timeout - 10);
 				} else {
 					return true;
@@ -118,8 +118,8 @@ public class DistributeLock implements Lock {
 	}
 
 	@Override
-	public void unLock(String type) {
-		type = prefix() + ":" + type;
+	public void unLock(String type,String typeKey) {
+		type = prefix() + ":" + type+":"+typeKey;
 		Map<String, String> cache = keyCache.get();
 		if (cache != null) {
 			String lockCacheKey = cache.get(type);
