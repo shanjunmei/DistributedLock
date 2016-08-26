@@ -15,7 +15,7 @@ public class LockTest {
 		JedisPool jedisPool=new JedisPool(host,port);
 		Lock lock = new DistributeLock();
 		((DistributeLock) lock).setJedisPool(jedisPool);
-		lock.lock(type);
+		lock.lock(type,"");
 		
 		
 		//lock.lock(type+"12");
@@ -31,9 +31,9 @@ public class LockTest {
 		boolean x=false;
 		long t = System.currentTimeMillis();
 		for (int i = 0; i < 10000; i++) {
-			x = lock.lock(type);
+			x = lock.lock(type,"");
 			//System.out.println(x);
-			lock.unLock(type);
+			lock.unLock(type,"");
 		}
 		t = System.currentTimeMillis() - t;
 		System.out.println(t + " ms");

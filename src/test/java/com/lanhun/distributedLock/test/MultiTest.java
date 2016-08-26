@@ -35,12 +35,12 @@ public class MultiTest {
 		@Override
 		public void run() {
 			for (int i = 0; i < 10; i++) {
-				if (lock.lock(type)) {
+				if (lock.lock(type,"")) {
 					j++;
 					System.out.println(j);
 					
 				}
-				lock.unLock(type);
+				lock.unLock(type,"");
 			}
 		}
 
