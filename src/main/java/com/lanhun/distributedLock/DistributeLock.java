@@ -16,9 +16,9 @@ public class DistributeLock implements Lock {
 
 	private Logger logger = LogManager.getLogger(getClass());
 
-	private ConcurrentHashMap<String, String> lockCache = new ConcurrentHashMap<String, String>();
+	private final ConcurrentHashMap<String, String> lockCache = new ConcurrentHashMap<>();
 
-	private ThreadLocal<Map<String, String>> keyCache = new ThreadLocal<Map<String, String>>();
+	private ThreadLocal<Map<String, String>> keyCache = new ThreadLocal<>();
 
 	private Pool<Jedis> jedisPool;
 
@@ -27,12 +27,12 @@ public class DistributeLock implements Lock {
 	}
 
 	// @Override
-	public String prefix() {
+	private String prefix() {
 		return "_lock";
 	}
 
 	// @Override
-	protected String generateKey() {
+	private String generateKey() {
 		return UUID.randomUUID().toString().replace("-", "");
 	}
 
@@ -48,7 +48,7 @@ public class DistributeLock implements Lock {
 		if (timeout == 0) {// 没有设置超时时间的锁，先校验本地缓存
 			synchronized (lockCache) {
 				if (lockCache.containsKey(type)) {
-					if (lockCache.get(type).equals(keyCache.get())) {
+					if (keyCache.get()!=null&&lockCache.get(type).equals(keyCache.get().get(type))) {
 						return true;
 					}
 				}
@@ -95,7 +95,7 @@ public class DistributeLock implements Lock {
 		if (timeout == 0) {
 			while (!lock(type,key)) {
 				try {
-					TimeUnit.MILLISECONDS.sleep(timeout - 10);
+					TimeUnit.MILLISECONDS.sleep( 10);
 				} catch (InterruptedException e) {
 					logger.info(e);
 				}
@@ -106,7 +106,7 @@ public class DistributeLock implements Lock {
 		while ((System.currentTimeMillis() - t) < timeout) {
 			try {
 				if (!lock(type,key)) {
-					TimeUnit.MILLISECONDS.sleep(timeout - 10);
+					TimeUnit.MILLISECONDS.sleep(10);
 				} else {
 					return true;
 				}
@@ -123,6 +123,7 @@ public class DistributeLock implements Lock {
 		Map<String, String> cache = keyCache.get();
 		if (cache != null) {
 			String lockCacheKey = cache.get(type);
+			cache.remove(type);
 			synchronized (lockCache) {
 				lockCache.remove(type, lockCacheKey);
 			}
@@ -137,6 +138,7 @@ public class DistributeLock implements Lock {
 			jedis.close();
 		} else {
 			// 忽略未加锁 进行解锁
+			logger.info("ignore unsafe unlock");
 		}
 
 	}
