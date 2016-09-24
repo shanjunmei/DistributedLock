@@ -3,16 +3,14 @@ package com.lanhun.distributedLock;
 import java.lang.reflect.Proxy;
 
 /**
- * 
  * @author vincent
- *
  */
 public class LockProxyFactory {
 
-	@SuppressWarnings("unchecked")
-	public static <T> T createProxy(Lock lock, T target) {
-		return (T) Proxy.newProxyInstance(target.getClass().getClassLoader(), target.getClass().getInterfaces(),
-				new DistributeLockProxy(target, lock));
-	}
+    @SuppressWarnings("unchecked")
+    public static <T> T createProxy(Lock lock, T target) {
+        return (T) Proxy.newProxyInstance(target.getClass().getClassLoader(), target.getClass().getInterfaces(),
+                new DistributeLockProxy(target, lock));
+    }
 
 }
