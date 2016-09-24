@@ -48,8 +48,19 @@ public class DistributeLock implements Lock {
 		if (timeout == 0) {// 没有设置超时时间的锁，先校验本地缓存
 			synchronized (lockCache) {
 				if (lockCache.containsKey(type)) {
-					if (keyCache.get()!=null&&lockCache.get(type).equals(keyCache.get().get(type))) {
-						return true;
+					if (keyCache.get()!=null) {
+						Map<String, String> localKeyCache = keyCache.get();
+						if(lockCache.get(type).equals(localKeyCache.get(type))){
+							String countStr = localKeyCache.get(type + "_count");
+							int count = Integer.valueOf(countStr);
+							count = count + 1;
+							localKeyCache.put(type + "_count", count + "");
+							return true;
+						}else{
+							//normal scene never occurred
+							logger.warn("last lock cache have not clean");
+							//return false;
+						}
 					}
 				}
 			}
@@ -123,7 +134,19 @@ public class DistributeLock implements Lock {
 		Map<String, String> cache = keyCache.get();
 		if (cache != null) {
 			String lockCacheKey = cache.get(type);
+			if(lockCacheKey==null||lockCacheKey.trim().equals("")){
+				logger.debug("ignored Unlock without lock for key:"+type);
+				return;
+			}
+			String countStr=cache.get(type+"_count");
+			int count=Integer.valueOf(countStr);
+			count=count-1;
+			cache.put(type+"_count", count+"");
+			if(count>0){
+				return;
+			}
 			cache.remove(type);
+			cache.remove(type+"_count");
 			synchronized (lockCache) {
 				lockCache.remove(type, lockCacheKey);
 			}
@@ -138,7 +161,7 @@ public class DistributeLock implements Lock {
 			jedis.close();
 		} else {
 			// 忽略未加锁 进行解锁
-			logger.info("ignore unsafe unlock");
+			logger.debug("ignored Unlock without lock for key:"+type);
 		}
 
 	}
