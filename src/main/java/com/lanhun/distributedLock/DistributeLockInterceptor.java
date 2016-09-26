@@ -1,26 +1,25 @@
 package com.lanhun.distributedLock;
 
-import java.lang.reflect.Method;
-
 import org.springframework.cglib.proxy.MethodInterceptor;
 import org.springframework.cglib.proxy.MethodProxy;
+
+import java.lang.reflect.Method;
+
 /**
- * 
  * @author vincent
- *
  */
 public class DistributeLockInterceptor implements MethodInterceptor {
 
-	private Lock lock;
+    private Lock lock;
 
-	public void setLock(Lock lock) {
-		this.lock = lock;
-	}
+    public void setLock(Lock lock) {
+        this.lock = lock;
+    }
 
-	@Override
-	public Object intercept(Object target, Method method, Object[] args, MethodProxy proxy) throws Throwable {
+    @Override
+    public Object intercept(Object target, Method method, Object[] args, MethodProxy proxy) throws Throwable {
 
-		return DistributeLockMethodExecutor.lockMethodExecute(target, method, args, lock);
-	}
+        return DistributeLockMethodExecutor.lockMethodExecute(target, method, args, lock);
+    }
 
 }

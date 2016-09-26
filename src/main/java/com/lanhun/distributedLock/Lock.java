@@ -1,24 +1,22 @@
 package com.lanhun.distributedLock;
 
 /**
- * 
  * @author vincent
- *
  */
 public interface Lock {
 
-	//String generateKey();
+    //String generateKey();
 
-	//String prefix();
-	
-	boolean lock(String type,String key);
+    //String prefix();
 
-	boolean lock(String type,String key, int timeout);
+    boolean lock(String type, String key);
 
-	boolean tryLock(String type,String key);
+    boolean lock(String type, String key, int timeout);
 
-	boolean tryLock(String type,String key, long timeout);
+    boolean tryLock(String type, String key);
 
-	void unLock(String type,String key);
+    boolean tryLock(String type, String key, long timeout);
+
+    void unLock(String type, String key);
 
 }
