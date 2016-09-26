@@ -1,5 +1,6 @@
 package com.lanhun.distributedLock;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -33,7 +34,7 @@ public class DistributeLock implements Lock {
 
 	// @Override
 	private String generateKey() {
-		return UUID.randomUUID().toString().replace("-", "");
+		return DateUtils.format("yyyyMMddHHmmss",new Date())+"_"+UUID.randomUUID().toString().replace("-", "");
 	}
 
 	@Override
