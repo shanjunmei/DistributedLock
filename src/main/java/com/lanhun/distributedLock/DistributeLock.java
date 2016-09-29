@@ -59,7 +59,7 @@ public class DistributeLock implements Lock {
 							return true;
 						}else{
 							//normal scene never occurred
-							logger.warn("last lock cache have not clean");
+							logger.warn("Last Lock Cache Have Not Clean");
 							//return false;
 						}
 					}
@@ -136,7 +136,7 @@ public class DistributeLock implements Lock {
 		if (cache != null) {
 			String lockCacheKey = cache.get(type);
 			if(lockCacheKey==null||lockCacheKey.trim().equals("")){
-				logger.debug("ignored Unlock without lock for key:"+type);
+				logger.debug("Ignored Unlock Without Lock For Key:"+type);
 				return;
 			}
 			String countStr=cache.get(type+"_count");
@@ -162,7 +162,7 @@ public class DistributeLock implements Lock {
 			jedis.close();
 		} else {
 			// 忽略未加锁 进行解锁
-			logger.debug("ignored Unlock without lock for key:"+type);
+			logger.debug("Ignored Unlock Without Lock For Key:"+type);
 		}
 
 	}
