@@ -8,9 +8,9 @@ import java.lang.reflect.Method;
  */
 public class DistributeLockProxy implements InvocationHandler {
 
-    private Object target;
+    private final Object target;
 
-    private Lock lock;
+    private final Lock lock;
 
     public DistributeLockProxy(Object target, Lock lock) {
         this.target = target;

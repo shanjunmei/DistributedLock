@@ -32,7 +32,7 @@ public class LockTest {
         long t = System.currentTimeMillis();
         for (int i = 0; i < 10000; i++) {
             x = lock.lock(type, "");
-            //System.out.println(x);
+            System.out.println(x);
             lock.unLock(type, "");
         }
         t = System.currentTimeMillis() - t;
