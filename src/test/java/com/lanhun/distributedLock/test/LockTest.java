@@ -14,7 +14,7 @@ public class LockTest {
         JedisPool jedisPool = new JedisPool(host, port);
         Lock lock = new DistributeLock();
         ((DistributeLock) lock).setJedisPool(jedisPool);
-        lock.lock(type, "");
+        // lock.lock(type, "");
 
 
         //lock.lock(type+"12");
@@ -24,6 +24,7 @@ public class LockTest {
         for (int i = 0; i < 100; i++) {
             t(type, lock);
         }
+        System.out.println("end");
     }
 
     private static void t(String type, Lock lock) {

@@ -86,7 +86,8 @@ public class DistributeLock implements Lock {
 				keyCache.set(cache);
 			}
 			cache.put(type, key);
-			if (timeout == 0) {
+            cache.put(type + "_count", "1");
+            if (timeout == 0) {
 				synchronized (lockCache) {
 					lockCache.put(type, key);
 				}
